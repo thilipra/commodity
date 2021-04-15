@@ -65,7 +65,7 @@ ui <- fluidPage(
                         value = 5),
             
             selectInput("currency",
-                        "Forecast Currency",
+                        "Forecasting Currency",
                         choices = currencyChoices
             )
             

@@ -2,7 +2,7 @@
 title: "Commodity Price Analysis"
 author: "Thilini Prasangika Dasanayaka"
 date: "15/04/2021"
-output: html_document
+output: md_document
 ---
 
 ```{r setup, include=FALSE}
@@ -11,11 +11,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Commodity Price Analysis
 
-The aim of this project is to analys the Commodity Price ...
+The aim of this project is analyzing and forecasting the the Commodity price(Gold,Sliver,Platinum,Palladium)
+
+The user can select the commodity and data can be displayed daily,weekly and monthly with in given time period and the interactive plot presents the price in USD,EURO and GBP.
+
+The price of the commodities are forecasting with in given forecasting time range and forecasting currency also can be selected by the user.
 
 ## Run Application
 
-To run the application
+Required library to run the application
 
 ```{r eval=FALSE}
  require(Quandl)
@@ -25,7 +29,7 @@ To run the application
 
 ```
 
-Required library to run the application
+To run the application
 
 ```{r eval=FALSE}
 runGitHub("commodity","thilipra" )
@@ -53,7 +57,9 @@ commoditySummary("Sliver","2020-01-01","2021-01-01")
 
 ```
 
-```{r , echo=FALSE}
+output
+
+```{r echo=FALSE, message=FALSE, , echo=FALSE}
 source("getSummary.R", local = knitr::knit_global())
 commoditySummary("gold")
 ```
