@@ -11,7 +11,7 @@ library(shiny)
 library(Quandl)
 library(forecast)
 library(dygraphs)
-source("apiKey.R")
+sourceCpp("apiKey.cpp")
 
 
 dataChoices <- c("Gold" = "Gold",
@@ -22,8 +22,8 @@ dataChoices <- c("Gold" = "Gold",
 
 
 
-frequencyChoices <- c("Days" = "daily",
-                      "Weeks" = "weekly", 
+frequencyChoices <- c("days" = "daily",
+                      "weeks" = "weekly", 
                       "months" = "monthly");
 
 currencyChoices <- c("USD" = 1,
@@ -60,7 +60,7 @@ ui <- fluidPage(
                         timeFormat = '%Y-%m-%d'),
             
             
-            sliderInput('periods', 'Months to forecaasse', 
+            sliderInput('periods', 'Time to Forecast', 
                         min = 1, max = 30,
                         value = 5),
             
@@ -84,10 +84,18 @@ ui <- fluidPage(
 
 # Define server logic
 server <- function(input, output) {
+    
+    
+    #required library to run the app
+    require(Quandl)
+    require (forecast)
+    require (dygraphs)
+    
     #set the api key to Quandl which is required to access api to get data
     Quandl.api_key(getApiKey())
     
     
+    #get the data
     commodity <- reactive({
         
         #to speed up the data retrieval select the columns that are needed
@@ -112,17 +120,15 @@ server <- function(input, output) {
                                 type = "xts",
                                 collapse = as.character(input$frequency)
         )
-        
+        # set meaningful names to columns
         colnames(commodityData) <- c("USD", "EURO" ,"GBP")
         
         commodity<-commodityData
     })
     
     
-    
+    #combined actual and forecast data
     combined_xts <- reactive({
-        
-        
         
         forecasted <- forecast(commodity()[, as.numeric(input$currency)], h = input$periods)
         
@@ -138,7 +144,7 @@ server <- function(input, output) {
         
         combined_xts <- cbind(commodity()[, as.numeric(input$currency)], forecast_xts)
         
-        # change  first column name .
+        # change  first column name 
         colnames(combined_xts)[1] <- "Actual"
         
         # combined data with history and forecast
@@ -150,8 +156,7 @@ server <- function(input, output) {
     
     output$commodity <- renderDygraph({
         dygraph(commodity(),
-                main = paste("Price history of", names(dataChoices[dataChoices==input$dataSet]), 
-                             sep = " ")) %>%
+                main = paste("Price history of", names(dataChoices[dataChoices==input$dataSet]))) %>%
             dyAxis("y", label = "Price") %>%
             dyOptions(axisLineWidth = 1.5, fillGraph = TRUE, drawGrid = TRUE)
     })
@@ -168,7 +173,7 @@ server <- function(input, output) {
         
         dygraph(combined_xts(),
                 main = paste(names(dataChoices[dataChoices==input$dataSet]), 
-                             ": Historical and Forecast", sep = " usd ")) %>%
+                             ": Historical and Forecast")) %>%
             
             # Add the actual series.
             dySeries("Actual", label = "Actual") %>%

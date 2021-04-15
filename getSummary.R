@@ -8,7 +8,7 @@
 #' Get the summary value of the commodity in the certain based on the user input
 #' summary details minimum value , 1st quarter ,median ,mean , 3rd quarter and maximum value
 #' 
-#' @param commodity commodity name one of the following Gold,Sliver,Platinum,Palladium
+#' @param commodity commodity name one of these Gold,Sliver,Platinum,Palladium
 #' @param startDate format YYYY-MM-DD  if no value provide assign the default value that is 1 years from current date 
 #' @param endDate   format YYYY-MM-DD  default value current date
 #' @return Data table 
@@ -23,17 +23,21 @@
 #' @export
 
 library(Quandl)
+library(stringr)
+source("apiKey.R")
 
 commoditySummary <- function(commodity,startDate=Sys.Date()-lubridate::years(1),
                               endDate=Sys.Date())
 {
-  Quandl.api_key('dsZGE2bdQS6oKGoYLjdt')
+  #set the api key to Quandl which is required to access api to get data
+  Quandl.api_key(getApiKey())
   
   
-  # Trim and lower case the input
+  # Trim and lower case the user input
   commodity <- str_trim(commodity)
   commodity <- tolower(commodity)
   
+  #to speed up the data retrieval select the columns that are needed
   if(commodity =="gold"){
     codes <- c("LBMA/GOLD.1", "LBMA/GOLD.3", "LBMA/GOLD.5")
   }
@@ -53,15 +57,16 @@ commoditySummary <- function(commodity,startDate=Sys.Date()-lubridate::years(1),
   #check the validity of the date and time period
   validateDays(startDate,endDate)
   
-  commodity_sum <- Quandl(codes, 
+  commodityData <- Quandl(codes, 
                           type = "xts", 
                           collapse = "daily",
                           start_date =startDate, 
                           end_date = endDate)
   
-  colnames(commodity_sum) <- c("USD", "EURO" ,"GBP")
+  # set meaningful names to columns
+  colnames(commodityData) <- c("USD", "EURO" ,"GBP")
   
-  return (summary(commodity_sum))
+  return (summary(commodityData))
 }
 
 
