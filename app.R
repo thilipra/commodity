@@ -11,8 +11,9 @@ library(shiny)
 library(Quandl)
 library(forecast)
 library(dygraphs)
+library(Rcpp)
 sourceCpp("apiKey.cpp")
-
+source("getSummary.R")
 
 dataChoices <- c("Gold" = "Gold",
                  "Sliver" = "Sliver", 
